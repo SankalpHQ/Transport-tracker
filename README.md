@@ -10,7 +10,7 @@ Navify helps users track buses , predict delays , suggest alternate routes , and
 - *Alternative Routes:* Find the shortest route to save time and fuel.
 - *User-friendly Interface:* Easy-to-use UI for all age groups.
 
-- images/Home page.png
+- ![Home page](images/Home page.png)
   
 ---
 
