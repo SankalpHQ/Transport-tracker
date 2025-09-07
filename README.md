@@ -10,7 +10,10 @@ Navify helps users track buses , predict delays , suggest alternate routes , and
 - *Alternative Routes:* Find the shortest route to save time and fuel.
 - *User-friendly Interface:* Easy-to-use UI for all age groups.
 
-  
+   ![Home page](images/Home%20page.png)
+  ![Map view](images/Mapping.png)
+  ![About us](images/About%20us.png)
+
   
 ---
 
@@ -21,8 +24,7 @@ Navify helps users track buses , predict delays , suggest alternate routes , and
 - *Maps & Tracking:* Leaflet.js (or any mapping library you used)  
 
 ---
-
-
+ 
 ## Live Demo
 Check out the live site here: [Navify](https://sankalphq.github.io/Transport-tracker/)
 
