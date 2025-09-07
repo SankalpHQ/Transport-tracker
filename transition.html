@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navify - Your AI-Powered Urban Transport Partner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'], // For a techy feel
+                    },
+                    colors: {
+                        primary: '#0F172A', // Slate 900 - Deep, dark background
+                        secondary: '#00F0FF', // Electric Cyan - For highlights and accents
+                        accent: '#8A2BE2',    // Blue Violet - Secondary accent for depth
+                        textLight: '#E2E8F0', // Slate 200 - Light text on dark backgrounds
+                        textMuted: '#94A3B8', // Slate 400 - Muted text/placeholders
+                        cardBg: '#1A202C',    // Darker slate for card backgrounds
+                        borderDark: '#2D3748', // Dark border color
+                    },
+                    animation: {
+                        'background-animate': 'gradient-shift 10s ease infinite',
+                        'fade-in-down': 'fade-in-down 1s ease-out forwards',
+                        'fade-in-up': 'fade-in-up 1s ease-out forwards',
+                        'fade-in-left': 'fade-in-left 1s ease-out forwards',
+                        'fade-in-right': 'fade-in-right 1s ease-out forwards',
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        'gradient-shift': {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        },
+                        'fade-in-down': {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        'fade-in-up': {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        'fade-in-left': {
+                            '0%': { opacity: '0', transform: 'translateX(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        'fade-in-right': {
+                            '0%': { opacity: '0', transform: 'translateX(20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0px rgba(0, 240, 255, 0.7)' },
+                            '50%': { transform: 'scale(1.03)', boxShadow: '0 0 15px rgba(0, 240, 255, 0.9)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @layer base {
+            html {
+                scroll-behavior: smooth;
+            }
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(45deg, #00F0FF, #8A2BE2);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            transition: transform 0.3s ease-in-out;
+        }
+        .logo-icon:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+        .logo-icon::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #0F172A;
+        }
+        
+        /* Hero Section Particle Effect */
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top left, rgba(0, 240, 255, 0.1) 0%, transparent 30%),
+                        radial-gradient(circle at bottom right, rgba(138, 43, 226, 0.1) 0%, transparent 30%);
+            animation: moveGradient 15s ease infinite alternate;
+            opacity: 0.7;
+            z-index: 0;
+        }
+        @keyframes moveGradient {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        .map-marker {
+            position: absolute;
+            transition: top 2s ease-in-out, left 2s ease-in-out;
+            transform: translate(-50%, -50%);
+            z-index: 20; /* Above the grid lines */
+            filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.7));
+            animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .map-marker .icon {
+            font-size: 32px; /* Larger emojis */
+            line-height: 1;
+            display: block; /* Ensures emoji is centered */
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
+        }
+        
+        .cta-button {
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
+        }
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease-out, height 0.4s ease-out;
+            opacity: 0;
+        }
+        .cta-button:hover::after {
+            width: 200px;
+            height: 200px;
+            opacity: 1;
+        }
+
+        .feature-card {
+            transition: all 0.4s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid transparent;
+            background: linear-gradient(145deg, #1A202C, #2D3748);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 240, 255, 0.3);
+            border-color: #00F0FF;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0, 240, 255, 0.1), transparent, rgba(138, 43, 226, 0.1));
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            z-index: 0;
+        }
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        .feature-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .glow-on-focus:focus {
+            border-color: #00F0FF;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+            outline: none;
+            background-color: #1A202C; /* Darker on focus */
+            color: #E2E8F0;
+        }
+        
+        /* Specific animations delays for staggered effect */
+        .animate-delay-100 { animation-delay: 0.1s; }
+        .animate-delay-200 { animation-delay: 0.2s; }
+        .animate-delay-300 { animation-delay: 0.3s; }
+        .animate-delay-400 { animation-delay: 0.4s; }
+        .animate-delay-500 { animation-delay: 0.5s; }
+    </style>
+</head>
+<body class="bg-primary text-textLight font-sans antialiased overflow-x-hidden">
+
+    <header class="bg-primary shadow-lg sticky top-0 z-50 border-b border-borderDark">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="logo-icon"></div>
+                <span class="text-2xl font-extrabold text-secondary group-hover:text-accent transition-colors">Navify</span>
+            </a>
+
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#hero" class="text-textLight hover:text-secondary transition-colors font-medium">Home</a>
+                <a href="#live-map" class="text-textLight hover:text-secondary transition-colors font-medium">Live Map</a>
+                <a href="#features" class="text-textLight hover:text-secondary transition-colors font-medium">Features</a>
+                <a href="#about" class="text-textLight hover:text-secondary transition-colors font-medium">About Us</a>
+                <a href="#contact" class="text-textLight hover:text-secondary transition-colors font-medium">Contact</a>
+                <a href="#app-download" class="bg-secondary text-primary font-semibold py-2 px-6 rounded-full shadow-lg cta-button hidden md:inline-block">
+                    Download App
+                </a>
+            </div>
+
+            <button id="mobile-menu-button" class="md:hidden text-secondary hover:text-accent transition-colors focus:outline-none" aria-controls="mobile-menu" aria-expanded="false">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </nav>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-cardBg shadow-lg py-4 border-t border-borderDark">
+            <a href="#hero" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Home</a>
+            <a href="#live-map" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Live Map</a>
+            <a href="#features" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Features</a>
+            <a href="#about" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">About Us</a>
+            <a href="#contact" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Contact</a>
+            <a href="#app-download" class="block px-4 py-2 text-secondary hover:bg-slate-700 font-medium">Download App</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="relative py-32 md:py-48 lg:py-64 bg-primary text-white flex items-center justify-center overflow-hidden">
+            <div class="container mx-auto px-4 text-center relative z-10">
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4 text-white animate-fade-in-down">
+                    Seamlessly Navigate the <span class="text-secondary">Future of Transport.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-textMuted mb-8 max-w-3xl mx-auto animate-fade-in-up animate-delay-200">
+                    Navify provides real-time tracking, predictive AI analytics, and smart routing for a smarter, more efficient urban commute.
+                </p>
+                <a href="#live-map" class="bg-secondary text-primary font-semibold py-3 px-8 rounded-full shadow-lg cta-button inline-block animate-fade-in-up animate-delay-400">
+                    Explore Live Map
+                </a>
+            </div>
+        </section>
+
+        <section id="live-map" class="py-16 md:py-24 bg-cardBg border-t border-borderDark">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-textLight">Real-Time <span class="text-secondary">Urban Mobility</span></h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    A live simulation of our AI-powered transport tracking. See all vehicles on the move.
+                </p>
+                <div class="relative w-full h-96 md:h-[600px] rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-900 to-primary border border-borderDark">
+                    <svg class="absolute inset-0 w-full h-full object-cover opacity-70" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" fill="#0F172A"/>
+                        <g fill="none" stroke="#2D3748" stroke-width="0.2">
+                            <path d="M0 5 L100 5 M0 15 L100 15 M0 25 L100 25 M0 35 L100 35 M0 45 L100 45 M0 55 L100 55 M0 65 L100 65 M0 75 L100 75 M0 85 L100 85 M0 95 L100 95"/>
+                            <path d="M5 0 L5 100 M15 0 L15 100 M25 0 L25 100 M35 0 L35 100 M45 0 L45 100 M55 0 L55 100 M65 0 L65 100 M75 0 L75 100 M85 0 L85 100 M95 0 L95 100"/>
+                        </g>
+                        <g fill="none" stroke="#00F0FF" stroke-width="0.1" stroke-opacity="0.3">
+                            <path d="M10 0 L0 10 M20 0 L0 20 M30 0 L0 30 M40 0 L0 40 M50 0 L0 50 M60 0 L0 60 M70 0 L0 70 M80 0 L0 80 M90 0 L0 90 M100 0 L10 100 M100 10 L20 100 M100 20 L30 100 M100 30 L40 100 M100 40 L50 100 M100 50 L60 100 M100 60 L70 100 M100 70 L80 100 M100 80 L90 100 M100 90 L100 100"/>
+                        </g>
+                    </svg>
+                    <div id="map-container" class="absolute inset-0 z-10">
+                        </div>
+                    <div class="absolute bottom-4 right-4 p-3 bg-primary bg-opacity-70 rounded-lg text-textLight text-sm font-mono shadow-md border border-borderDark">
+                        <span class="text-secondary">Live Data:</span> <span id="vehicle-count">5</span> Vehicles Active
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-16 md:py-24 bg-primary border-t border-borderDark">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-textLight">Unleashing <span class="text-secondary">AI-Powered</span> Features</h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    Navify is engineered with cutting-edge AI to provide you with the most efficient and reliable travel experience imaginable.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-100">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Real-time GPS Tracking</h3>
+                        <p class="text-textMuted text-sm">Accurate, second-by-second updates for all transport modes, powered by satellite-grade precision.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-200">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.65 1.65l-1.32 1.32c1.07 1.07 1.77 2.5 1.77 4.13a6 6 0 01-6 6c-1.63 0-3.06-.7-4.13-1.77L5.35 12.35l-1.42 1.42L12 21.92l8.07-8.07-1.42-1.42-1.32 1.32C15.82 12.7 13.9 13.5 12 13.5c-2.48 0-4.5-2.02-4.5-4.5 0-1.9.8-3.82 2.22-5.24l1.32-1.32L17.65 1.65zM12 9c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Intelligent Route Optimization</h3>
+                        <p class="text-textMuted text-sm">Our AI dynamically plans your journey, adapting to real-time traffic and public transport disruptions.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-300">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Predictive Arrival Analytics</h3>
+                        <p class="text-textMuted text-sm">Never guess again. Our machine learning models predict precise arrival times and potential delays.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-400">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Holographic UI Integration</h3>
+                        <p class="text-textMuted text-sm">Experience navigation through a clean, intuitive, and visually stunning interface.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-500">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Dynamic Carbon Footprint</h3>
+                        <p class="text-textMuted text-sm">Monitor and minimize your environmental impact with eco-friendly route suggestions.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-600">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Offline Navigation Matrix</h3>
+                        <p class="text-textMuted text-sm">Download intricate city maps for seamless navigation, even in signal-dead zones.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="py-16 md:py-24 bg-cardBg border-t border-borderDark relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary via-slate-800 to-accent opacity-20 -z-0 bg-background-animate"></div>
+            <div class="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-center gap-12 relative z-10">
+                <div class="lg:w-1/2 animate-fade-in-left">
+                    <img src="https://placehold.co/600x400/0F172A/00F0FF?text=Navify+Visionaries" alt="About Navify team" class="rounded-2xl shadow-xl border-2 border-secondary animate-pulse-glow" loading="lazy">
+                </div>
+                <div class="lg:w-1/2 animate-fade-in-right">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-textLight">Meet the <span class="text-secondary">Visionaries</span> Behind Navify</h2>
+                    <p class="text-textMuted mb-4 font-mono">
+                        Navify was forged from a singular vision: to revolutionize urban mobility. We are a collective of AI engineers, urban planners, and design futurists, united by a passion for creating intelligent, intuitive, and impactful transport solutions.
+                    </p>
+                    <p class="text-textMuted font-mono">
+                        Our journey began with the belief that technology can seamlessly integrate with the pulse of the city, transforming commutes from mundane to magnificent. We are not just building an app; we are crafting the future of connected travel.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="app-download" class="py-16 md:py-24 bg-primary border-t border-borderDark">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-textLight">Ready to Command Your <span class="text-secondary">Future Commute?</span></h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    Download the Navify AI today and start navigating your city with unparalleled intelligence. Access cutting-edge features on all major platforms.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">
+                    <a href="#" class="bg-gradient-to-r from-secondary to-accent text-white font-semibold py-3 px-8 rounded-full shadow-lg cta-button">
+                        <span class="relative z-10">Download on the App Store</span>
+                    </a>
+                    <a href="#" class="bg-gradient-to-r from-accent to-secondary text-white font-semibold py-3 px-8 rounded-full shadow-lg cta-button">
+                        <span class="relative z-10">Get it on Google Play</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-16 md:py-24 bg-gradient-to-br from-primary to-slate-800 border-t border-borderDark relative overflow-hidden">
+            <div class="container mx-auto px-4 relative z-10">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-textLight">Connect with the <span class="text-secondary">Navify Nexus</span></h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    Whether feedback, inquiries, or collaboration proposals, our lines are open. Join us in shaping tomorrow's urban landscape.
+                </p>
+                <div class="max-w-xl mx-auto bg-cardBg p-8 rounded-2xl shadow-2xl border border-borderDark backdrop-blur-sm bg-opacity-70">
+                    <form id="contact-form" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-textLight mb-1">Your Designation</label>
+                            <input type="text" id="name" name="name" class="mt-1 block w-full rounded-md border-borderDark bg-primary text-textLight placeholder-textMuted shadow-sm p-3 focus:ring-secondary glow-on-focus" placeholder="Enter your name or organization" required>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-textLight mb-1">Secure Contact Protocol</label>
+                            <input type="email" id="email" name="email" class="mt-1 block w-full rounded-md border-borderDark bg-primary text-textLight placeholder-textMuted shadow-sm p-3 focus:ring-secondary glow-on-focus" placeholder="your.email@example.com" required>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-textLight mb-1">Transmission Message</label>
+                            <textarea id="message" name="message" rows="5" class="mt-1 block w-full rounded-md border-borderDark bg-primary text-textLight placeholder-textMuted shadow-sm p-3 focus:ring-secondary glow-on-focus" placeholder="Your message here, commander..." required></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="bg-gradient-to-r from-secondary to-accent text-white font-bold text-lg py-3 px-10 rounded-full shadow-xl cta-button">
+                                <span class="relative z-10">Transmit Data</span>
+                            </button>
+                        </div>
+                        <div id="form-message" class="text-center mt-4 hidden font-mono text-sm"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-primary text-textMuted py-12 border-t border-borderDark">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-4 text-sm font-mono">&copy; 2023 Navify AI. All rights reserved. | <span class="text-secondary">Redefining Urban Commute.</span></p>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="text-textMuted hover:text-secondary transition-colors" aria-label="Instagram">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.253.15 4.878 1.76 5.042 5.042.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.164 3.253-1.77 4.878-5.042 5.042-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-3.264-.164-4.879-1.76-5.042-5.042-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.164-3.253 1.77-4.878 5.042-5.042 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.666 0-4.06.016-5.467.076-3.832.182-6.096 2.45-6.279 6.279-.06 1.407-.076 1.801-.076 5.467s.016 4.06.076 5.467c.183 3.832 2.45 6.096 6.279 6.279 1.407.06 1.801.076 5.467.076s4.06-.016 5.467-.076c3.832-.183 6.096-2.45 6.279-6.279.06-1.407.076-1.801.076-5.467s-.016-4.06-.076-5.467c-.183-3.832-2.45-6.096-6.279-6.279-1.407-.06-1.801-.076-5.467-.076zm0 6.641c-3.132 0-5.678 2.545-5.678 5.678s2.546 5.678 5.678 5.678 5.678-2.545 5.678-5.678-2.546-5.678-5.678-5.678zm0 9.166c-1.921 0-3.488-1.567-3.488-3.488s1.567-3.488 3.488-3.488 3.488 1.567 3.488 3.488-1.567 3.488-3.488 3.488zm5.163-11.49c-.624 0-1.134-.51-1.134-1.134s.51-1.134 1.134-1.134 1.134.51 1.134 1.134-.51 1.134-1.134 1.134z"/></svg>
+                </a>
+                <a href="#" class="text-textMuted hover:text-secondary transition-colors" aria-label="LinkedIn">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M22.23 0H1.77C.794 0 0 .794 0 1.77v20.462C0 23.206.794 24 1.77 24h20.461C23.206 24 24 23.206 24 22.232V1.768C24 .794 23.206 0 22.23 0zM7.187 20.43H3.618V9.165h3.569V20.43zM5.31 7.68c-1.157 0-2.095-.94-2.095-2.094 0-1.155.938-2.095 2.095-2.095 1.155 0 2.094.94 2.094 2.095 0 1.154-.939 2.094-2.094 2.094zm15.12 12.75h-3.568V14.5c0-1.63-.58-2.74-2.03-2.74-1.107 0-1.766.75-2.062 1.47-.099.255-.124.577-.124.9V20.43h-3.568s.047-10.42 0-11.265h3.568v1.61c.47-.757 1.3-1.84 3.195-1.84 2.32 0 4.053 1.517 4.053 4.793V20.43z"/></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle with Accessibility
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu when a link is clicked
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                });
+            });
+            
+            // Simulated Live Map
+            const mapContainer = document.getElementById('map-container');
+            const vehicleCountDisplay = document.getElementById('vehicle-count');
+
+            const vehicles = [
+                { id: 'bus-1', type: 'bus', x: 20, y: 30, color: '#FFD700', label: 'B1' }, // Gold for buses
+                { id: 'car-1', type: 'car', x: 80, y: 70, color: '#00F0FF', label: 'C1' }, // Cyan for cars
+                { id: 'metro-1', type: 'metro', x: 50, y: 50, color: '#8A2BE2', label: 'M1' }, // Violet for metros
+                { id: 'car-2', type: 'car', x: 10, y: 80, color: '#00F0FF', label: 'C2' },
+                { id: 'bus-2', type: 'bus', x: 60, y: 20, color: '#FFD700', label: 'B2' },
+                { id: 'car-3', type: 'car', x: 30, y: 60, color: '#00F0FF', label: 'C3' },
+                { id: 'metro-2', type: 'metro', x: 70, y: 15, color: '#8A2BE2', label: 'M2' },
+            ];
+            
+            const vehicleIcons = {
+                'bus': '🚌',
+                'car': '🚗',
+                'metro': '🚇'
+            };
+
+            // Function to animate elements into view (optional, but good for scroll effects)
+            const animateOnScroll = () => {
+                const elements = document.querySelectorAll('.animate-fade-in-up, .animate-fade-in-left, .animate-fade-in-right');
+                elements.forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && rect.bottom > 0) {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0) translateX(0)';
+                    }
+                });
+            };
+
+            // Set initial state for animations
+            document.querySelectorAll('.animate-fade-in-up, .animate-fade-in-left, .animate-fade-in-right').forEach(el => {
+                el.style.opacity = '0';
+            });
+            
+            const updateMap = () => {
+                vehicles.forEach(vehicle => {
+                    let marker = document.getElementById(vehicle.id);
+                    if (!marker) {
+                        marker = document.createElement('div');
+                        marker.id = vehicle.id;
+                        marker.classList.add('map-marker');
+                        marker.innerHTML = <span class="icon" style="color:${vehicle.color}">${vehicleIcons[vehicle.type]}</span>;
+                        mapContainer.appendChild(marker);
+                    }
+                    
+                    // Simulate more complex movement (e.g., in a path)
+                    // For now, retaining random movement for simplicity and dynamic feel
+                    vehicle.x += (Math.random() * 2 - 1) * 0.8; // Faster, more erratic movement
+                    vehicle.y += (Math.random() * 2 - 1) * 0.8;
+                    
+                    // Keep within boundaries
+                    vehicle.x = Math.max(5, Math.min(95, vehicle.x)); // Slightly in from edges
+                    vehicle.y = Math.max(5, Math.min(95, vehicle.y));
+                    
+                    marker.style.top = ${vehicle.y}%;
+                    marker.style.left = ${vehicle.x}%;
+                });
+                vehicleCountDisplay.textContent = vehicles.length;
+            };
+            
+            // Update map every 1.5 seconds for snappier feel
+            setInterval(updateMap, 1500);
+            updateMap(); // Initial update
+
+            // Add an event listener for scroll to trigger animations
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll(); // Trigger on load in case elements are already in view
+            
+            // Simulated Contact Form with client-side validation
+            const contactForm = document.getElementById('contact-form');
+            const formMessage = document.getElementById('form-message');
+            
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Basic client-side validation
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const message = document.getElementById('message').value;
+                
+                if (!name || !email || !message) {
+                    formMessage.classList.remove('hidden', 'text-secondary');
+                    formMessage.classList.add('text-accent');
+                    formMessage.textContent = '[ERROR] Protocol incomplete: All fields are mandatory for transmission.';
+                    return;
+                }
+                
+                // Email format validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    formMessage.classList.remove('hidden', 'text-secondary');
+                    formMessage.classList.add('text-accent');
+                    formMessage.textContent = '[ERROR] Invalid email format: Please re-enter secure contact protocol.';
+                    return;
+                }
+
+                formMessage.classList.remove('hidden', 'text-accent');
+                formMessage.classList.add('text-secondary');
+                formMessage.textContent = '[TRANSMISSION SUCCESSFUL] Thank you for connecting with the Navify Nexus! A representative will respond shortly.';
+                
+                contactForm.reset();
+            });
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navify - Your AI-Powered Urban Transport Partner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'], // For a techy feel
+                    },
+                    colors: {
+                        primary: '#0F172A', // Slate 900 - Deep, dark background
+                        secondary: '#00F0FF', // Electric Cyan - For highlights and accents
+                        accent: '#8A2BE2',    // Blue Violet - Secondary accent for depth
+                        textLight: '#E2E8F0', // Slate 200 - Light text on dark backgrounds
+                        textMuted: '#94A3B8', // Slate 400 - Muted text/placeholders
+                        cardBg: '#1A202C',    // Darker slate for card backgrounds
+                        borderDark: '#2D3748', // Dark border color
+                    },
+                    animation: {
+                        'background-animate': 'gradient-shift 10s ease infinite',
+                        'fade-in-down': 'fade-in-down 1s ease-out forwards',
+                        'fade-in-up': 'fade-in-up 1s ease-out forwards',
+                        'fade-in-left': 'fade-in-left 1s ease-out forwards',
+                        'fade-in-right': 'fade-in-right 1s ease-out forwards',
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        'gradient-shift': {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        },
+                        'fade-in-down': {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        'fade-in-up': {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        'fade-in-left': {
+                            '0%': { opacity: '0', transform: 'translateX(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        'fade-in-right': {
+                            '0%': { opacity: '0', transform: 'translateX(20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0px rgba(0, 240, 255, 0.7)' },
+                            '50%': { transform: 'scale(1.03)', boxShadow: '0 0 15px rgba(0, 240, 255, 0.9)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @layer base {
+            html {
+                scroll-behavior: smooth;
+            }
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(45deg, #00F0FF, #8A2BE2);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            transition: transform 0.3s ease-in-out;
+        }
+        .logo-icon:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+        .logo-icon::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #0F172A;
+        }
+        
+        /* Hero Section Particle Effect */
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top left, rgba(0, 240, 255, 0.1) 0%, transparent 30%),
+                        radial-gradient(circle at bottom right, rgba(138, 43, 226, 0.1) 0%, transparent 30%);
+            animation: moveGradient 15s ease infinite alternate;
+            opacity: 0.7;
+            z-index: 0;
+        }
+        @keyframes moveGradient {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        .map-marker {
+            position: absolute;
+            transition: top 2s ease-in-out, left 2s ease-in-out;
+            transform: translate(-50%, -50%);
+            z-index: 20; /* Above the grid lines */
+            filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.7));
+            animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .map-marker .icon {
+            font-size: 32px; /* Larger emojis */
+            line-height: 1;
+            display: block; /* Ensures emoji is centered */
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
+        }
+        
+        .cta-button {
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
+        }
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease-out, height 0.4s ease-out;
+            opacity: 0;
+        }
+        .cta-button:hover::after {
+            width: 200px;
+            height: 200px;
+            opacity: 1;
+        }
+
+        .feature-card {
+            transition: all 0.4s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid transparent;
+            background: linear-gradient(145deg, #1A202C, #2D3748);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 240, 255, 0.3);
+            border-color: #00F0FF;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0, 240, 255, 0.1), transparent, rgba(138, 43, 226, 0.1));
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            z-index: 0;
+        }
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        .feature-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .glow-on-focus:focus {
+            border-color: #00F0FF;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+            outline: none;
+            background-color: #1A202C; /* Darker on focus */
+            color: #E2E8F0;
+        }
+        
+        /* Specific animations delays for staggered effect */
+        .animate-delay-100 { animation-delay: 0.1s; }
+        .animate-delay-200 { animation-delay: 0.2s; }
+        .animate-delay-300 { animation-delay: 0.3s; }
+        .animate-delay-400 { animation-delay: 0.4s; }
+        .animate-delay-500 { animation-delay: 0.5s; }
+    </style>
+</head>
+<body class="bg-primary text-textLight font-sans antialiased overflow-x-hidden">
+
+    <header class="bg-primary shadow-lg sticky top-0 z-50 border-b border-borderDark">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="logo-icon"></div>
+                <span class="text-2xl font-extrabold text-secondary group-hover:text-accent transition-colors">Navify</span>
+            </a>
+
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#hero" class="text-textLight hover:text-secondary transition-colors font-medium">Home</a>
+                <a href="#live-map" class="text-textLight hover:text-secondary transition-colors font-medium">Live Map</a>
+                <a href="#features" class="text-textLight hover:text-secondary transition-colors font-medium">Features</a>
+                <a href="#about" class="text-textLight hover:text-secondary transition-colors font-medium">About Us</a>
+                <a href="#contact" class="text-textLight hover:text-secondary transition-colors font-medium">Contact</a>
+                <a href="#app-download" class="bg-secondary text-primary font-semibold py-2 px-6 rounded-full shadow-lg cta-button hidden md:inline-block">
+                    Download App
+                </a>
+            </div>
+
+            <button id="mobile-menu-button" class="md:hidden text-secondary hover:text-accent transition-colors focus:outline-none" aria-controls="mobile-menu" aria-expanded="false">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </nav>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-cardBg shadow-lg py-4 border-t border-borderDark">
+            <a href="#hero" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Home</a>
+            <a href="#live-map" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Live Map</a>
+            <a href="#features" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Features</a>
+            <a href="#about" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">About Us</a>
+            <a href="#contact" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Contact</a>
+            <a href="#app-download" class="block px-4 py-2 text-secondary hover:bg-slate-700 font-medium">Download App</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="relative py-32 md:py-48 lg:py-64 bg-primary text-white flex items-center justify-center overflow-hidden">
+            <div class="container mx-auto px-4 text-center relative z-10">
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4 text-white animate-fade-in-down">
+                    Seamlessly Navigate the <span class="text-secondary">Future of Transport.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-textMuted mb-8 max-w-3xl mx-auto animate-fade-in-up animate-delay-200">
+                    Navify provides real-time tracking, predictive AI analytics, and smart routing for a smarter, more efficient urban commute.
+                </p>
+                <a href="#live-map" class="bg-secondary text-primary font-semibold py-3 px-8 rounded-full shadow-lg cta-button inline-block animate-fade-in-up animate-delay-400">
+                    Explore Live Map
+                </a>
+            </div>
+        </section>
+
+        <section id="live-map" class="py-16 md:py-24 bg-cardBg border-t border-borderDark">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-textLight">Real-Time <span class="text-secondary">Urban Mobility</span></h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    A live simulation of our AI-powered transport tracking. See all vehicles on the move.
+                </p>
+                <div class="relative w-full h-96 md:h-[600px] rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-900 to-primary border border-borderDark">
+                    <svg class="absolute inset-0 w-full h-full object-cover opacity-70" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" fill="#0F172A"/>
+                        <g fill="none" stroke="#2D3748" stroke-width="0.2">
+                            <path d="M0 5 L100 5 M0 15 L100 15 M0 25 L100 25 M0 35 L100 35 M0 45 L100 45 M0 55 L100 55 M0 65 L100 65 M0 75 L100 75 M0 85 L100 85 M0 95 L100 95"/>
+                            <path d="M5 0 L5 100 M15 0 L15 100 M25 0 L25 100 M35 0 L35 100 M45 0 L45 100 M55 0 L55 100 M65 0 L65 100 M75 0 L75 100 M85 0 L85 100 M95 0 L95 100"/>
+                        </g>
+                        <g fill="none" stroke="#00F0FF" stroke-width="0.1" stroke-opacity="0.3">
+                            <path d="M10 0 L0 10 M20 0 L0 20 M30 0 L0 30 M40 0 L0 40 M50 0 L0 50 M60 0 L0 60 M70 0 L0 70 M80 0 L0 80 M90 0 L0 90 M100 0 L10 100 M100 10 L20 100 M100 20 L30 100 M100 30 L40 100 M100 40 L50 100 M100 50 L60 100 M100 60 L70 100 M100 70 L80 100 M100 80 L90 100 M100 90 L100 100"/>
+                        </g>
+                    </svg>
+                    <div id="map-container" class="absolute inset-0 z-10">
+                        </div>
+                    <div class="absolute bottom-4 right-4 p-3 bg-primary bg-opacity-70 rounded-lg text-textLight text-sm font-mono shadow-md border border-borderDark">
+                        <span class="text-secondary">Live Data:</span> <span id="vehicle-count">5</span> Vehicles Active
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-16 md:py-24 bg-primary border-t border-borderDark">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-textLight">Unleashing <span class="text-secondary">AI-Powered</span> Features</h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    Navify is engineered with cutting-edge AI to provide you with the most efficient and reliable travel experience imaginable.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-100">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Real-time GPS Tracking</h3>
+                        <p class="text-textMuted text-sm">Accurate, second-by-second updates for all transport modes, powered by satellite-grade precision.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-200">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.65 1.65l-1.32 1.32c1.07 1.07 1.77 2.5 1.77 4.13a6 6 0 01-6 6c-1.63 0-3.06-.7-4.13-1.77L5.35 12.35l-1.42 1.42L12 21.92l8.07-8.07-1.42-1.42-1.32 1.32C15.82 12.7 13.9 13.5 12 13.5c-2.48 0-4.5-2.02-4.5-4.5 0-1.9.8-3.82 2.22-5.24l1.32-1.32L17.65 1.65zM12 9c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Intelligent Route Optimization</h3>
+                        <p class="text-textMuted text-sm">Our AI dynamically plans your journey, adapting to real-time traffic and public transport disruptions.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-300">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Predictive Arrival Analytics</h3>
+                        <p class="text-textMuted text-sm">Never guess again. Our machine learning models predict precise arrival times and potential delays.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-400">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Holographic UI Integration</h3>
+                        <p class="text-textMuted text-sm">Experience navigation through a clean, intuitive, and visually stunning interface.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-500">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Dynamic Carbon Footprint</h3>
+                        <p class="text-textMuted text-sm">Monitor and minimize your environmental impact with eco-friendly route suggestions.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-600">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Offline Navigation Matrix</h3>
+                        <p class="text-textMuted text-sm">Download intricate city maps for seamless navigation, even in signal-dead zones.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="py-16 md:py-24 bg-cardBg border-t border-borderDark relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary via-slate-800 to-accent opacity-20 -z-0 bg-background-animate"></div>
+            <div class="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-center gap-12 relative z-10">
+                <div class="lg:w-1/2 animate-fade-in-left">
+                    <img src="https://placehold.co/600x400/0F172A/00F0FF?text=Navify+Visionaries" alt="About Navify team" class="rounded-2xl shadow-xl border-2 border-secondary animate-pulse-glow" loading="lazy">
+                </div>
+                <div class="lg:w-1/2 animate-fade-in-right">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-textLight">Meet the <span class="text-secondary">Visionaries</span> Behind Navify</h2>
+                    <p class="text-textMuted mb-4 font-mono">
+                        Navify was forged from a singular vision: to revolutionize urban mobility. We are a collective of AI engineers, urban planners, and design futurists, united by a passion for creating intelligent, intuitive, and impactful transport solutions.
+                    </p>
+                    <p class="text-textMuted font-mono">
+                        Our journey began with the belief that technology can seamlessly integrate with the pulse of the city, transforming commutes from mundane to magnificent. We are not just building an app; we are crafting the future of connected travel.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="app-download" class="py-16 md:py-24 bg-primary border-t border-borderDark">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-textLight">Ready to Command Your <span class="text-secondary">Future Commute?</span></h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    Download the Navify AI today and start navigating your city with unparalleled intelligence. Access cutting-edge features on all major platforms.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">
+                    <a href="#" class="bg-gradient-to-r from-secondary to-accent text-white font-semibold py-3 px-8 rounded-full shadow-lg cta-button">
+                        <span class="relative z-10">Download on the App Store</span>
+                    </a>
+                    <a href="#" class="bg-gradient-to-r from-accent to-secondary text-white font-semibold py-3 px-8 rounded-full shadow-lg cta-button">
+                        <span class="relative z-10">Get it on Google Play</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-16 md:py-24 bg-gradient-to-br from-primary to-slate-800 border-t border-borderDark relative overflow-hidden">
+            <div class="container mx-auto px-4 relative z-10">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-textLight">Connect with the <span class="text-secondary">Navify Nexus</span></h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    Whether feedback, inquiries, or collaboration proposals, our lines are open. Join us in shaping tomorrow's urban landscape.
+                </p>
+                <div class="max-w-xl mx-auto bg-cardBg p-8 rounded-2xl shadow-2xl border border-borderDark backdrop-blur-sm bg-opacity-70">
+                    <form id="contact-form" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-textLight mb-1">Your Designation</label>
+                            <input type="text" id="name" name="name" class="mt-1 block w-full rounded-md border-borderDark bg-primary text-textLight placeholder-textMuted shadow-sm p-3 focus:ring-secondary glow-on-focus" placeholder="Enter your name or organization" required>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-textLight mb-1">Secure Contact Protocol</label>
+                            <input type="email" id="email" name="email" class="mt-1 block w-full rounded-md border-borderDark bg-primary text-textLight placeholder-textMuted shadow-sm p-3 focus:ring-secondary glow-on-focus" placeholder="your.email@example.com" required>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-textLight mb-1">Transmission Message</label>
+                            <textarea id="message" name="message" rows="5" class="mt-1 block w-full rounded-md border-borderDark bg-primary text-textLight placeholder-textMuted shadow-sm p-3 focus:ring-secondary glow-on-focus" placeholder="Your message here, commander..." required></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="bg-gradient-to-r from-secondary to-accent text-white font-bold text-lg py-3 px-10 rounded-full shadow-xl cta-button">
+                                <span class="relative z-10">Transmit Data</span>
+                            </button>
+                        </div>
+                        <div id="form-message" class="text-center mt-4 hidden font-mono text-sm"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-primary text-textMuted py-12 border-t border-borderDark">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-4 text-sm font-mono">&copy; 2023 Navify AI. All rights reserved. | <span class="text-secondary">Redefining Urban Commute.</span></p>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="text-textMuted hover:text-secondary transition-colors" aria-label="Instagram">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.253.15 4.878 1.76 5.042 5.042.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.164 3.253-1.77 4.878-5.042 5.042-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-3.264-.164-4.879-1.76-5.042-5.042-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.164-3.253 1.77-4.878 5.042-5.042 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.666 0-4.06.016-5.467.076-3.832.182-6.096 2.45-6.279 6.279-.06 1.407-.076 1.801-.076 5.467s.016 4.06.076 5.467c.183 3.832 2.45 6.096 6.279 6.279 1.407.06 1.801.076 5.467.076s4.06-.016 5.467-.076c3.832-.183 6.096-2.45 6.279-6.279.06-1.407.076-1.801.076-5.467s-.016-4.06-.076-5.467c-.183-3.832-2.45-6.096-6.279-6.279-1.407-.06-1.801-.076-5.467-.076zm0 6.641c-3.132 0-5.678 2.545-5.678 5.678s2.546 5.678 5.678 5.678 5.678-2.545 5.678-5.678-2.546-5.678-5.678-5.678zm0 9.166c-1.921 0-3.488-1.567-3.488-3.488s1.567-3.488 3.488-3.488 3.488 1.567 3.488 3.488-1.567 3.488-3.488 3.488zm5.163-11.49c-.624 0-1.134-.51-1.134-1.134s.51-1.134 1.134-1.134 1.134.51 1.134 1.134-.51 1.134-1.134 1.134z"/></svg>
+                </a>
+                <a href="#" class="text-textMuted hover:text-secondary transition-colors" aria-label="LinkedIn">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M22.23 0H1.77C.794 0 0 .794 0 1.77v20.462C0 23.206.794 24 1.77 24h20.461C23.206 24 24 23.206 24 22.232V1.768C24 .794 23.206 0 22.23 0zM7.187 20.43H3.618V9.165h3.569V20.43zM5.31 7.68c-1.157 0-2.095-.94-2.095-2.094 0-1.155.938-2.095 2.095-2.095 1.155 0 2.094.94 2.094 2.095 0 1.154-.939 2.094-2.094 2.094zm15.12 12.75h-3.568V14.5c0-1.63-.58-2.74-2.03-2.74-1.107 0-1.766.75-2.062 1.47-.099.255-.124.577-.124.9V20.43h-3.568s.047-10.42 0-11.265h3.568v1.61c.47-.757 1.3-1.84 3.195-1.84 2.32 0 4.053 1.517 4.053 4.793V20.43z"/></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle with Accessibility
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu when a link is clicked
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                });
+            });
+            
+            // Simulated Live Map
+            const mapContainer = document.getElementById('map-container');
+            const vehicleCountDisplay = document.getElementById('vehicle-count');
+
+            const vehicles = [
+                { id: 'bus-1', type: 'bus', x: 20, y: 30, color: '#FFD700', label: 'B1' }, // Gold for buses
+                { id: 'car-1', type: 'car', x: 80, y: 70, color: '#00F0FF', label: 'C1' }, // Cyan for cars
+                { id: 'metro-1', type: 'metro', x: 50, y: 50, color: '#8A2BE2', label: 'M1' }, // Violet for metros
+                { id: 'car-2', type: 'car', x: 10, y: 80, color: '#00F0FF', label: 'C2' },
+                { id: 'bus-2', type: 'bus', x: 60, y: 20, color: '#FFD700', label: 'B2' },
+                { id: 'car-3', type: 'car', x: 30, y: 60, color: '#00F0FF', label: 'C3' },
+                { id: 'metro-2', type: 'metro', x: 70, y: 15, color: '#8A2BE2', label: 'M2' },
+            ];
+            
+            const vehicleIcons = {
+                'bus': '🚌',
+                'car': '🚗',
+                'metro': '🚇'
+            };
+
+            // Function to animate elements into view (optional, but good for scroll effects)
+            const animateOnScroll = () => {
+                const elements = document.querySelectorAll('.animate-fade-in-up, .animate-fade-in-left, .animate-fade-in-right');
+                elements.forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && rect.bottom > 0) {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0) translateX(0)';
+                    }
+                });
+            };
+
+            // Set initial state for animations
+            document.querySelectorAll('.animate-fade-in-up, .animate-fade-in-left, .animate-fade-in-right').forEach(el => {
+                el.style.opacity = '0';
+            });
+            
+            const updateMap = () => {
+                vehicles.forEach(vehicle => {
+                    let marker = document.getElementById(vehicle.id);
+                    if (!marker) {
+                        marker = document.createElement('div');
+                        marker.id = vehicle.id;
+                        marker.classList.add('map-marker');
+                        marker.innerHTML = <span class="icon" style="color:${vehicle.color}">${vehicleIcons[vehicle.type]}</span>;
+                        mapContainer.appendChild(marker);
+                    }
+                    
+                    // Simulate more complex movement (e.g., in a path)
+                    // For now, retaining random movement for simplicity and dynamic feel
+                    vehicle.x += (Math.random() * 2 - 1) * 0.8; // Faster, more erratic movement
+                    vehicle.y += (Math.random() * 2 - 1) * 0.8;
+                    
+                    // Keep within boundaries
+                    vehicle.x = Math.max(5, Math.min(95, vehicle.x)); // Slightly in from edges
+                    vehicle.y = Math.max(5, Math.min(95, vehicle.y));
+                    
+                    marker.style.top = ${vehicle.y}%;
+                    marker.style.left = ${vehicle.x}%;
+                });
+                vehicleCountDisplay.textContent = vehicles.length;
+            };
+            
+            // Update map every 1.5 seconds for snappier feel
+            setInterval(updateMap, 1500);
+            updateMap(); // Initial update
+
+            // Add an event listener for scroll to trigger animations
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll(); // Trigger on load in case elements are already in view
+            
+            // Simulated Contact Form with client-side validation
+            const contactForm = document.getElementById('contact-form');
+            const formMessage = document.getElementById('form-message');
+            
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Basic client-side validation
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const message = document.getElementById('message').value;
+                
+                if (!name || !email || !message) {
+                    formMessage.classList.remove('hidden', 'text-secondary');
+                    formMessage.classList.add('text-accent');
+                    formMessage.textContent = '[ERROR] Protocol incomplete: All fields are mandatory for transmission.';
+                    return;
+                }
+                
+                // Email format validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    formMessage.classList.remove('hidden', 'text-secondary');
+                    formMessage.classList.add('text-accent');
+                    formMessage.textContent = '[ERROR] Invalid email format: Please re-enter secure contact protocol.';
+                    return;
+                }
+
+                formMessage.classList.remove('hidden', 'text-accent');
+                formMessage.classList.add('text-secondary');
+                formMessage.textContent = '[TRANSMISSION SUCCESSFUL] Thank you for connecting with the Navify Nexus! A representative will respond shortly.';
+                
+                contactForm.reset();
+            });
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navify - Your AI-Powered Urban Transport Partner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'], // For a techy feel
+                    },
+                    colors: {
+                        primary: '#0F172A', // Slate 900 - Deep, dark background
+                        secondary: '#00F0FF', // Electric Cyan - For highlights and accents
+                        accent: '#8A2BE2',    // Blue Violet - Secondary accent for depth
+                        textLight: '#E2E8F0', // Slate 200 - Light text on dark backgrounds
+                        textMuted: '#94A3B8', // Slate 400 - Muted text/placeholders
+                        cardBg: '#1A202C',    // Darker slate for card backgrounds
+                        borderDark: '#2D3748', // Dark border color
+                    },
+                    animation: {
+                        'background-animate': 'gradient-shift 10s ease infinite',
+                        'fade-in-down': 'fade-in-down 1s ease-out forwards',
+                        'fade-in-up': 'fade-in-up 1s ease-out forwards',
+                        'fade-in-left': 'fade-in-left 1s ease-out forwards',
+                        'fade-in-right': 'fade-in-right 1s ease-out forwards',
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        'gradient-shift': {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        },
+                        'fade-in-down': {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        'fade-in-up': {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        'fade-in-left': {
+                            '0%': { opacity: '0', transform: 'translateX(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        'fade-in-right': {
+                            '0%': { opacity: '0', transform: 'translateX(20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0px rgba(0, 240, 255, 0.7)' },
+                            '50%': { transform: 'scale(1.03)', boxShadow: '0 0 15px rgba(0, 240, 255, 0.9)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @layer base {
+            html {
+                scroll-behavior: smooth;
+            }
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(45deg, #00F0FF, #8A2BE2);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            transition: transform 0.3s ease-in-out;
+        }
+        .logo-icon:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+        .logo-icon::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #0F172A;
+        }
+        
+        /* Hero Section Particle Effect */
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top left, rgba(0, 240, 255, 0.1) 0%, transparent 30%),
+                        radial-gradient(circle at bottom right, rgba(138, 43, 226, 0.1) 0%, transparent 30%);
+            animation: moveGradient 15s ease infinite alternate;
+            opacity: 0.7;
+            z-index: 0;
+        }
+        @keyframes moveGradient {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        .map-marker {
+            position: absolute;
+            transition: top 2s ease-in-out, left 2s ease-in-out;
+            transform: translate(-50%, -50%);
+            z-index: 20; /* Above the grid lines */
+            filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.7));
+            animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .map-marker .icon {
+            font-size: 32px; /* Larger emojis */
+            line-height: 1;
+            display: block; /* Ensures emoji is centered */
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
+        }
+        
+        .cta-button {
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
+        }
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease-out, height 0.4s ease-out;
+            opacity: 0;
+        }
+        .cta-button:hover::after {
+            width: 200px;
+            height: 200px;
+            opacity: 1;
+        }
+
+        .feature-card {
+            transition: all 0.4s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid transparent;
+            background: linear-gradient(145deg, #1A202C, #2D3748);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 240, 255, 0.3);
+            border-color: #00F0FF;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0, 240, 255, 0.1), transparent, rgba(138, 43, 226, 0.1));
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            z-index: 0;
+        }
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        .feature-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .glow-on-focus:focus {
+            border-color: #00F0FF;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+            outline: none;
+            background-color: #1A202C; /* Darker on focus */
+            color: #E2E8F0;
+        }
+        
+        /* Specific animations delays for staggered effect */
+        .animate-delay-100 { animation-delay: 0.1s; }
+        .animate-delay-200 { animation-delay: 0.2s; }
+        .animate-delay-300 { animation-delay: 0.3s; }
+        .animate-delay-400 { animation-delay: 0.4s; }
+        .animate-delay-500 { animation-delay: 0.5s; }
+    </style>
+</head>
+<body class="bg-primary text-textLight font-sans antialiased overflow-x-hidden">
+
+    <header class="bg-primary shadow-lg sticky top-0 z-50 border-b border-borderDark">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="logo-icon"></div>
+                <span class="text-2xl font-extrabold text-secondary group-hover:text-accent transition-colors">Navify</span>
+            </a>
+
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#hero" class="text-textLight hover:text-secondary transition-colors font-medium">Home</a>
+                <a href="#live-map" class="text-textLight hover:text-secondary transition-colors font-medium">Live Map</a>
+                <a href="#features" class="text-textLight hover:text-secondary transition-colors font-medium">Features</a>
+                <a href="#about" class="text-textLight hover:text-secondary transition-colors font-medium">About Us</a>
+                <a href="#contact" class="text-textLight hover:text-secondary transition-colors font-medium">Contact</a>
+                <a href="#app-download" class="bg-secondary text-primary font-semibold py-2 px-6 rounded-full shadow-lg cta-button hidden md:inline-block">
+                    Download App
+                </a>
+            </div>
+
+            <button id="mobile-menu-button" class="md:hidden text-secondary hover:text-accent transition-colors focus:outline-none" aria-controls="mobile-menu" aria-expanded="false">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </nav>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-cardBg shadow-lg py-4 border-t border-borderDark">
+            <a href="#hero" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Home</a>
+            <a href="#live-map" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Live Map</a>
+            <a href="#features" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Features</a>
+            <a href="#about" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">About Us</a>
+            <a href="#contact" class="block px-4 py-2 text-textLight hover:bg-slate-700 font-medium">Contact</a>
+            <a href="#app-download" class="block px-4 py-2 text-secondary hover:bg-slate-700 font-medium">Download App</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="relative py-32 md:py-48 lg:py-64 bg-primary text-white flex items-center justify-center overflow-hidden">
+            <div class="container mx-auto px-4 text-center relative z-10">
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4 text-white animate-fade-in-down">
+                    Seamlessly Navigate the <span class="text-secondary">Future of Transport.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-textMuted mb-8 max-w-3xl mx-auto animate-fade-in-up animate-delay-200">
+                    Navify provides real-time tracking, predictive AI analytics, and smart routing for a smarter, more efficient urban commute.
+                </p>
+                <a href="#live-map" class="bg-secondary text-primary font-semibold py-3 px-8 rounded-full shadow-lg cta-button inline-block animate-fade-in-up animate-delay-400">
+                    Explore Live Map
+                </a>
+            </div>
+        </section>
+
+        <section id="live-map" class="py-16 md:py-24 bg-cardBg border-t border-borderDark">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-textLight">Real-Time <span class="text-secondary">Urban Mobility</span></h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    A live simulation of our AI-powered transport tracking. See all vehicles on the move.
+                </p>
+                <div class="relative w-full h-96 md:h-[600px] rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-900 to-primary border border-borderDark">
+                    <svg class="absolute inset-0 w-full h-full object-cover opacity-70" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" fill="#0F172A"/>
+                        <g fill="none" stroke="#2D3748" stroke-width="0.2">
+                            <path d="M0 5 L100 5 M0 15 L100 15 M0 25 L100 25 M0 35 L100 35 M0 45 L100 45 M0 55 L100 55 M0 65 L100 65 M0 75 L100 75 M0 85 L100 85 M0 95 L100 95"/>
+                            <path d="M5 0 L5 100 M15 0 L15 100 M25 0 L25 100 M35 0 L35 100 M45 0 L45 100 M55 0 L55 100 M65 0 L65 100 M75 0 L75 100 M85 0 L85 100 M95 0 L95 100"/>
+                        </g>
+                        <g fill="none" stroke="#00F0FF" stroke-width="0.1" stroke-opacity="0.3">
+                            <path d="M10 0 L0 10 M20 0 L0 20 M30 0 L0 30 M40 0 L0 40 M50 0 L0 50 M60 0 L0 60 M70 0 L0 70 M80 0 L0 80 M90 0 L0 90 M100 0 L10 100 M100 10 L20 100 M100 20 L30 100 M100 30 L40 100 M100 40 L50 100 M100 50 L60 100 M100 60 L70 100 M100 70 L80 100 M100 80 L90 100 M100 90 L100 100"/>
+                        </g>
+                    </svg>
+                    <div id="map-container" class="absolute inset-0 z-10">
+                        </div>
+                    <div class="absolute bottom-4 right-4 p-3 bg-primary bg-opacity-70 rounded-lg text-textLight text-sm font-mono shadow-md border border-borderDark">
+                        <span class="text-secondary">Live Data:</span> <span id="vehicle-count">5</span> Vehicles Active
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-16 md:py-24 bg-primary border-t border-borderDark">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-textLight">Unleashing <span class="text-secondary">AI-Powered</span> Features</h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    Navify is engineered with cutting-edge AI to provide you with the most efficient and reliable travel experience imaginable.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-100">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Real-time GPS Tracking</h3>
+                        <p class="text-textMuted text-sm">Accurate, second-by-second updates for all transport modes, powered by satellite-grade precision.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-200">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.65 1.65l-1.32 1.32c1.07 1.07 1.77 2.5 1.77 4.13a6 6 0 01-6 6c-1.63 0-3.06-.7-4.13-1.77L5.35 12.35l-1.42 1.42L12 21.92l8.07-8.07-1.42-1.42-1.32 1.32C15.82 12.7 13.9 13.5 12 13.5c-2.48 0-4.5-2.02-4.5-4.5 0-1.9.8-3.82 2.22-5.24l1.32-1.32L17.65 1.65zM12 9c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Intelligent Route Optimization</h3>
+                        <p class="text-textMuted text-sm">Our AI dynamically plans your journey, adapting to real-time traffic and public transport disruptions.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-300">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Predictive Arrival Analytics</h3>
+                        <p class="text-textMuted text-sm">Never guess again. Our machine learning models predict precise arrival times and potential delays.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-400">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Holographic UI Integration</h3>
+                        <p class="text-textMuted text-sm">Experience navigation through a clean, intuitive, and visually stunning interface.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-500">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Dynamic Carbon Footprint</h3>
+                        <p class="text-textMuted text-sm">Monitor and minimize your environmental impact with eco-friendly route suggestions.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center animate-fade-in-up animate-delay-600">
+                        <svg class="w-14 h-14 text-secondary mx-auto mb-4 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16H8v-2h3v2zm3-4H8v-2h6v2zm3-4h-9V7h9v2z"></path></svg>
+                        <h3 class="text-xl font-semibold mb-2 text-textLight">Offline Navigation Matrix</h3>
+                        <p class="text-textMuted text-sm">Download intricate city maps for seamless navigation, even in signal-dead zones.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="py-16 md:py-24 bg-cardBg border-t border-borderDark relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary via-slate-800 to-accent opacity-20 -z-0 bg-background-animate"></div>
+            <div class="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-center gap-12 relative z-10">
+                <div class="lg:w-1/2 animate-fade-in-left">
+                    <img src="https://placehold.co/600x400/0F172A/00F0FF?text=Navify+Visionaries" alt="About Navify team" class="rounded-2xl shadow-xl border-2 border-secondary animate-pulse-glow" loading="lazy">
+                </div>
+                <div class="lg:w-1/2 animate-fade-in-right">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-textLight">Meet the <span class="text-secondary">Visionaries</span> Behind Navify</h2>
+                    <p class="text-textMuted mb-4 font-mono">
+                        Navify was forged from a singular vision: to revolutionize urban mobility. We are a collective of AI engineers, urban planners, and design futurists, united by a passion for creating intelligent, intuitive, and impactful transport solutions.
+                    </p>
+                    <p class="text-textMuted font-mono">
+                        Our journey began with the belief that technology can seamlessly integrate with the pulse of the city, transforming commutes from mundane to magnificent. We are not just building an app; we are crafting the future of connected travel.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="app-download" class="py-16 md:py-24 bg-primary border-t border-borderDark">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-textLight">Ready to Command Your <span class="text-secondary">Future Commute?</span></h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    Download the Navify AI today and start navigating your city with unparalleled intelligence. Access cutting-edge features on all major platforms.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">
+                    <a href="#" class="bg-gradient-to-r from-secondary to-accent text-white font-semibold py-3 px-8 rounded-full shadow-lg cta-button">
+                        <span class="relative z-10">Download on the App Store</span>
+                    </a>
+                    <a href="#" class="bg-gradient-to-r from-accent to-secondary text-white font-semibold py-3 px-8 rounded-full shadow-lg cta-button">
+                        <span class="relative z-10">Get it on Google Play</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-16 md:py-24 bg-gradient-to-br from-primary to-slate-800 border-t border-borderDark relative overflow-hidden">
+            <div class="container mx-auto px-4 relative z-10">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-textLight">Connect with the <span class="text-secondary">Navify Nexus</span></h2>
+                <p class="text-center text-textMuted mb-12 max-w-2xl mx-auto font-mono">
+                    Whether feedback, inquiries, or collaboration proposals, our lines are open. Join us in shaping tomorrow's urban landscape.
+                </p>
+                <div class="max-w-xl mx-auto bg-cardBg p-8 rounded-2xl shadow-2xl border border-borderDark backdrop-blur-sm bg-opacity-70">
+                    <form id="contact-form" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-textLight mb-1">Your Designation</label>
+                            <input type="text" id="name" name="name" class="mt-1 block w-full rounded-md border-borderDark bg-primary text-textLight placeholder-textMuted shadow-sm p-3 focus:ring-secondary glow-on-focus" placeholder="Enter your name or organization" required>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-textLight mb-1">Secure Contact Protocol</label>
+                            <input type="email" id="email" name="email" class="mt-1 block w-full rounded-md border-borderDark bg-primary text-textLight placeholder-textMuted shadow-sm p-3 focus:ring-secondary glow-on-focus" placeholder="your.email@example.com" required>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-textLight mb-1">Transmission Message</label>
+                            <textarea id="message" name="message" rows="5" class="mt-1 block w-full rounded-md border-borderDark bg-primary text-textLight placeholder-textMuted shadow-sm p-3 focus:ring-secondary glow-on-focus" placeholder="Your message here, commander..." required></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="bg-gradient-to-r from-secondary to-accent text-white font-bold text-lg py-3 px-10 rounded-full shadow-xl cta-button">
+                                <span class="relative z-10">Transmit Data</span>
+                            </button>
+                        </div>
+                        <div id="form-message" class="text-center mt-4 hidden font-mono text-sm"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-primary text-textMuted py-12 border-t border-borderDark">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-4 text-sm font-mono">&copy; 2023 Navify AI. All rights reserved. | <span class="text-secondary">Redefining Urban Commute.</span></p>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="text-textMuted hover:text-secondary transition-colors" aria-label="Instagram">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.253.15 4.878 1.76 5.042 5.042.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.164 3.253-1.77 4.878-5.042 5.042-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-3.264-.164-4.879-1.76-5.042-5.042-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.164-3.253 1.77-4.878 5.042-5.042 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.666 0-4.06.016-5.467.076-3.832.182-6.096 2.45-6.279 6.279-.06 1.407-.076 1.801-.076 5.467s.016 4.06.076 5.467c.183 3.832 2.45 6.096 6.279 6.279 1.407.06 1.801.076 5.467.076s4.06-.016 5.467-.076c3.832-.183 6.096-2.45 6.279-6.279.06-1.407.076-1.801.076-5.467s-.016-4.06-.076-5.467c-.183-3.832-2.45-6.096-6.279-6.279-1.407-.06-1.801-.076-5.467-.076zm0 6.641c-3.132 0-5.678 2.545-5.678 5.678s2.546 5.678 5.678 5.678 5.678-2.545 5.678-5.678-2.546-5.678-5.678-5.678zm0 9.166c-1.921 0-3.488-1.567-3.488-3.488s1.567-3.488 3.488-3.488 3.488 1.567 3.488 3.488-1.567 3.488-3.488 3.488zm5.163-11.49c-.624 0-1.134-.51-1.134-1.134s.51-1.134 1.134-1.134 1.134.51 1.134 1.134-.51 1.134-1.134 1.134z"/></svg>
+                </a>
+                <a href="#" class="text-textMuted hover:text-secondary transition-colors" aria-label="LinkedIn">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M22.23 0H1.77C.794 0 0 .794 0 1.77v20.462C0 23.206.794 24 1.77 24h20.461C23.206 24 24 23.206 24 22.232V1.768C24 .794 23.206 0 22.23 0zM7.187 20.43H3.618V9.165h3.569V20.43zM5.31 7.68c-1.157 0-2.095-.94-2.095-2.094 0-1.155.938-2.095 2.095-2.095 1.155 0 2.094.94 2.094 2.095 0 1.154-.939 2.094-2.094 2.094zm15.12 12.75h-3.568V14.5c0-1.63-.58-2.74-2.03-2.74-1.107 0-1.766.75-2.062 1.47-.099.255-.124.577-.124.9V20.43h-3.568s.047-10.42 0-11.265h3.568v1.61c.47-.757 1.3-1.84 3.195-1.84 2.32 0 4.053 1.517 4.053 4.793V20.43z"/></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle with Accessibility
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu when a link is clicked
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                });
+            });
+            
+            // Simulated Live Map
+            const mapContainer = document.getElementById('map-container');
+            const vehicleCountDisplay = document.getElementById('vehicle-count');
+
+            const vehicles = [
+                { id: 'bus-1', type: 'bus', x: 20, y: 30, color: '#FFD700', label: 'B1' }, // Gold for buses
+                { id: 'car-1', type: 'car', x: 80, y: 70, color: '#00F0FF', label: 'C1' }, // Cyan for cars
+                { id: 'metro-1', type: 'metro', x: 50, y: 50, color: '#8A2BE2', label: 'M1' }, // Violet for metros
+                { id: 'car-2', type: 'car', x: 10, y: 80, color: '#00F0FF', label: 'C2' },
+                { id: 'bus-2', type: 'bus', x: 60, y: 20, color: '#FFD700', label: 'B2' },
+                { id: 'car-3', type: 'car', x: 30, y: 60, color: '#00F0FF', label: 'C3' },
+                { id: 'metro-2', type: 'metro', x: 70, y: 15, color: '#8A2BE2', label: 'M2' },
+            ];
+            
+            const vehicleIcons = {
+                'bus': '🚌',
+                'car': '🚗',
+                'metro': '🚇'
+            };
+
+            // Function to animate elements into view (optional, but good for scroll effects)
+            const animateOnScroll = () => {
+                const elements = document.querySelectorAll('.animate-fade-in-up, .animate-fade-in-left, .animate-fade-in-right');
+                elements.forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && rect.bottom > 0) {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0) translateX(0)';
+                    }
+                });
+            };
+
+            // Set initial state for animations
+            document.querySelectorAll('.animate-fade-in-up, .animate-fade-in-left, .animate-fade-in-right').forEach(el => {
+                el.style.opacity = '0';
+            });
+            
+            const updateMap = () => {
+                vehicles.forEach(vehicle => {
+                    let marker = document.getElementById(vehicle.id);
+                    if (!marker) {
+                        marker = document.createElement('div');
+                        marker.id = vehicle.id;
+                        marker.classList.add('map-marker');
+                        marker.innerHTML = <span class="icon" style="color:${vehicle.color}">${vehicleIcons[vehicle.type]}</span>;
+                        mapContainer.appendChild(marker);
+                    }
+                    
+                    // Simulate more complex movement (e.g., in a path)
+                    // For now, retaining random movement for simplicity and dynamic feel
+                    vehicle.x += (Math.random() * 2 - 1) * 0.8; // Faster, more erratic movement
+                    vehicle.y += (Math.random() * 2 - 1) * 0.8;
+                    
+                    // Keep within boundaries
+                    vehicle.x = Math.max(5, Math.min(95, vehicle.x)); // Slightly in from edges
+                    vehicle.y = Math.max(5, Math.min(95, vehicle.y));
+                    
+                    marker.style.top = ${vehicle.y}%;
+                    marker.style.left = ${vehicle.x}%;
+                });
+                vehicleCountDisplay.textContent = vehicles.length;
+            };
+            
+            // Update map every 1.5 seconds for snappier feel
+            setInterval(updateMap, 1500);
+            updateMap(); // Initial update
+
+            // Add an event listener for scroll to trigger animations
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll(); // Trigger on load in case elements are already in view
+            
+            // Simulated Contact Form with client-side validation
+            const contactForm = document.getElementById('contact-form');
+            const formMessage = document.getElementById('form-message');
+            
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Basic client-side validation
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const message = document.getElementById('message').value;
+                
+                if (!name || !email || !message) {
+                    formMessage.classList.remove('hidden', 'text-secondary');
+                    formMessage.classList.add('text-accent');
+                    formMessage.textContent = '[ERROR] Protocol incomplete: All fields are mandatory for transmission.';
+                    return;
+                }
+                
+                // Email format validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    formMessage.classList.remove('hidden', 'text-secondary');
+                    formMessage.classList.add('text-accent');
+                    formMessage.textContent = '[ERROR] Invalid email format: Please re-enter secure contact protocol.';
+                    return;
+                }
+
+                formMessage.classList.remove('hidden', 'text-accent');
+                formMessage.classList.add('text-secondary');
+                formMessage.textContent = '[TRANSMISSION SUCCESSFUL] Thank you for connecting with the Navify Nexus! A representative will respond shortly.';
+                
+                contactForm.reset();
+            });
+        });
+    </script>
+</body>
+</html>
